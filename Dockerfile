@@ -1,9 +1,9 @@
-FROM phusion/baseimage:0.9.15
+FROM phusion/baseimage:0.9.18
 
 # Ensure UTF-8
-RUN locale-gen en_US.UTF-8
-ENV LANG       en_US.UTF-8
-ENV LC_ALL     en_US.UTF-8
+RUN locale-gen pt_BR.UTF-8
+ENV LANG       pt_BR.UTF-8
+ENV LC_ALL     pt_BR.UTF-8
 
 ENV HOME /root
 
@@ -18,7 +18,7 @@ RUN add-apt-repository -y ppa:ondrej/php5
 RUN add-apt-repository -y ppa:nginx/stable
 RUN apt-get update
 RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y --force-yes php5-cli php5-fpm php5-mysql php5-pgsql php5-sqlite php5-curl\
-		       php5-gd php5-mcrypt php5-intl php5-imap php5-tidy
+		       php5-gd php5-mcrypt php5-intl php5-imap php5-tidy php5-xmlrpc
 
 RUN sed -i "s/;date.timezone =.*/date.timezone = UTC/" /etc/php5/fpm/php.ini
 RUN sed -i "s/;date.timezone =.*/date.timezone = UTC/" /etc/php5/cli/php.ini

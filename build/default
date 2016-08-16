@@ -4,6 +4,8 @@ server {
     root /var/www;
     index index.html index.htm index.php;
 
+    rewrite ^/moodle/(.*\.php)(/)(.*)$ /moodle/$1?file=/$3 last;
+
     # Make site accessible from http://set-ip-address.xip.io
     server_name localhost;
 
