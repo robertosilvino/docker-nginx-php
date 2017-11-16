@@ -28,9 +28,7 @@ RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 RUN sed -i -e "s/;daemonize\s*=\s*yes/daemonize = no/g" /etc/php/5.6/fpm/php-fpm.conf
 RUN sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php/5.6/fpm/php.ini
- 
-RUN mkdir -p        /var/www
-ADD build/default   /etc/nginx/sites-available/default
+
 RUN mkdir           /etc/service/nginx
 ADD build/nginx.sh  /etc/service/nginx/run
 RUN chmod +x        /etc/service/nginx/run
