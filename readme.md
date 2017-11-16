@@ -64,7 +64,7 @@ Para checar a existência da imagem o comando abaixo podeser utilizado:
 ```bash
 sudo docker images
 REPOSITORY              TAG                 IMAGE ID            CREATED             SIZE
-docker-php56-nginx      latest              c0253e257acc        4 days ago          619MB
+docker-php70-nginx      latest              c0253e257acc        4 days ago          619MB
 ...
 ```
 

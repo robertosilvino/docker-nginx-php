@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sudo docker exec -it docker-nginx-php56 /bin/bash 
+sudo docker exec -it docker-nginx-php70 /bin/bash
