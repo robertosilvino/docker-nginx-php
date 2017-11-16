@@ -4,3 +4,4 @@
 /moodledata/*
 /www/*
 !readme.md
+.idea
