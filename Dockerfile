@@ -1,4 +1,4 @@
-FROM phusion/baseimage:0.9.18
+FROM phusion/baseimage:0.9.22
 
 # Ensure UTF-8
 RUN locale-gen pt_BR.UTF-8
@@ -17,8 +17,9 @@ RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y vim curl wget build-esse
 RUN add-apt-repository -y ppa:ondrej/php
 RUN add-apt-repository -y ppa:nginx/stable
 RUN apt-get update
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y --force-yes php5.6-cli php5.6-fpm php5.6-mysql php5.6-pgsql php5.6-sqlite php5.6-curl\
-		       php5.6-gd php5.6-mcrypt php5.6-intl php5.6-imap php5.6-tidy php5.6-xmlrpc php5.6-dom php5.6-zip php5.6-soap php5.6-mbstring
+RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y --force-yes php5.6-cli php5.6-fpm php5.6-mysql php5.6-pgsql \
+    php5.6-sqlite php5.6-curl php5.6-gd php5.6-mcrypt php5.6-intl php5.6-imap php5.6-tidy php5.6-xmlrpc php5.6-dom \
+    php5.6-zip php5.6-soap php5.6-mbstring php-xdebug
 
 RUN sed -i "s/;date.timezone =.*/date.timezone = UTC/" /etc/php/5.6/fpm/php.ini
 RUN sed -i "s/;date.timezone =.*/date.timezone = UTC/" /etc/php/5.6/cli/php.ini

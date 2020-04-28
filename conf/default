@@ -23,10 +23,11 @@ server {
 
     error_page 404 /index.php;
 
+    fastcgi_intercept_errors on;
     # pass the PHP scripts to php5-fpm
     # Note: \.php$ is susceptible to file upload attacks
     # Consider using: "location ~ ^/(index|app|app_dev|config)\.php(/|$) {"
-    location ~ \.php$ {
+    location ~\.php$ {
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
         # With php5-fpm:
         fastcgi_pass unix:/var/run/php/php5.6-fpm.sock;

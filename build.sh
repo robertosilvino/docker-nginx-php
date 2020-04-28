@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sudo docker build -t docker-php56-nginx .  
+sudo docker build -t php56-nginx .
