@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-# php7.0-fpm -c /etc/php/7.0/fpm/
-service php7.0-fpm start
+# php7.1-fpm -c /etc/php/7.1/fpm/
+service php7.1-fpm start
