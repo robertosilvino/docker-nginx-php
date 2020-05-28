@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sudo docker build -t docker-php70-nginx .
+sudo docker build -t php70-nginx .
