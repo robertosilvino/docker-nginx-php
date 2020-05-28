@@ -20,6 +20,7 @@ RUN apt-get update
 RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y --force-yes php5.6-cli php5.6-fpm php5.6-mysql php5.6-pgsql \
     php5.6-sqlite php5.6-curl php5.6-gd php5.6-mcrypt php5.6-intl php5.6-imap php5.6-tidy php5.6-xmlrpc php5.6-dom \
     php5.6-zip php5.6-soap php5.6-mbstring php-xdebug
+RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y freetds-bin php5.6-sybase
 
 RUN sed -i "s/;date.timezone =.*/date.timezone = UTC/" /etc/php/5.6/fpm/php.ini
 RUN sed -i "s/;date.timezone =.*/date.timezone = UTC/" /etc/php/5.6/cli/php.ini
@@ -30,12 +31,23 @@ RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 RUN sed -i -e "s/;daemonize\s*=\s*yes/daemonize = no/g" /etc/php/5.6/fpm/php-fpm.conf
 RUN sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php/5.6/fpm/php.ini
 
+# Configure PHP-FPM
+COPY .docker-config/fpm-pool.conf /etc/php/5.6/fpm/zzz_custom.conf
+COPY .docker-config/php.ini /etc/php/5.6/fpm/conf.d/zzz_custom.ini
+COPY .docker-config/www.conf /etc/php/5.6/fpm/conf.d/www.conf
+
 RUN mkdir           /etc/service/nginx
 ADD build/nginx.sh  /etc/service/nginx/run
 RUN chmod +x        /etc/service/nginx/run
 RUN mkdir           /etc/service/phpfpm
 ADD build/phpfpm.sh /etc/service/phpfpm/run
 RUN chmod +x        /etc/service/phpfpm/run
+
+RUN chown -R :www-data /var/www && \
+    mkdir -p /moodledata && \
+    chown -R :www-data /moodledata
+
+RUN rm -rf .docker-config/
 
 EXPOSE 80
 # End Nginx-PHP
