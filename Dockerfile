@@ -18,26 +18,35 @@ RUN add-apt-repository -y ppa:ondrej/php
 RUN add-apt-repository -y ppa:nginx/stable
 #RUN apt-get update
 RUN apt-get update --fix-missing
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y --force-yes php7.1 php7.1-cli php7.1-fpm php7.1-mysql \
- php7.1-curl php7.1-gd php7.1-mcrypt php7.1-intl php7.1-imap php7.1-tidy php7.1-xmlrpc php7.1-dom php7.1-zip \
- php7.1-soap php7.1-mbstring php7.1-pspell php7.1-recode php7.1-sqlite3 php7.1-xsl
+RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y --allow-remove-essential php7.2 php7.2-cli php7.2-fpm php7.2-mysql \
+ php7.2-curl php7.2-gd php7.2-intl php7.2-imap php7.2-tidy php-xml php7.0-xml php7.0-xmlrpc php7.2-dom php7.2-zip \
+ php7.2-soap php7.2-mbstring php7.2-pspell php7.2-recode php7.2-sqlite3 php7.2-xsl
 # php-xdebug
 
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y freetds-bin php7.1-sybase
+# Pear issue
+RUN mkdir -p /tmp/pear/cache
 
-RUN sed -i "s/;date.timezone =.*/date.timezone = UTC/" /etc/php/7.1/fpm/php.ini
-RUN sed -i "s/;date.timezone =.*/date.timezone = UTC/" /etc/php/7.1/cli/php.ini
+RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y --allow-remove-essential php7.2-dev libmcrypt-dev php-pear \
+    libc-dev pkg-config libmcrypt-dev
+RUN DEBIAN_FRONTEND="noninteractive" pecl channel-update pecl.php.net
+RUN DEBIAN_FRONTEND="noninteractive" pecl install mcrypt-1.0.1
+#RUN DEBIAN_FRONTEND="noninteractive" pecl install mcrypt-1.0.2
+
+RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y freetds-bin php7.2-sybase
+
+RUN sed -i "s/;date.timezone =.*/date.timezone = UTC/" /etc/php/7.2/fpm/php.ini
+RUN sed -i "s/;date.timezone =.*/date.timezone = UTC/" /etc/php/7.2/cli/php.ini
 
 RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y nginx
 
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
-RUN sed -i -e "s/;daemonize\s*=\s*yes/daemonize = no/g" /etc/php/7.1/fpm/php-fpm.conf
-RUN sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php/7.1/fpm/php.ini
+RUN sed -i -e "s/;daemonize\s*=\s*yes/daemonize = no/g" /etc/php/7.2/fpm/php-fpm.conf
+RUN sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php/7.2/fpm/php.ini
 
 # Configure PHP-FPM
-COPY .docker-config/fpm-pool.conf /etc/php/7.1/fpm/zzz_custom.conf
-COPY .docker-config/php.ini /etc/php/7.1/fpm/conf.d/zzz_custom.ini
-COPY .docker-config/www.conf /etc/php/7.1/fpm/conf.d/www.conf
+COPY .docker-config/fpm-pool.conf /etc/php/7.2/fpm/zzz_custom.conf
+COPY .docker-config/php.ini /etc/php/7.2/fpm/conf.d/zzz_custom.ini
+COPY .docker-config/www.conf /etc/php/7.2/fpm/conf.d/www.conf
 
 RUN mkdir           /etc/service/nginx
 ADD build/nginx.sh  /etc/service/nginx/run
