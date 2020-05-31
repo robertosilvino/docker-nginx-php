@@ -1,16 +1,16 @@
 server {
     listen  80;
 
-    root /var/www/unasus2_38;
+    root /var/www/unasus2-38;
     index index.html index.htm index.php;
 
     rewrite ^/(.*\.php)(/)(.*)$ /$1?file=/$3 last;
 
     # Make site accessible from http://set-ip-address.xip.io
-    server_name local-unasus2_38.moodle.ufsc.br;
+    server_name local-unasus2-38.moodle.ufsc.br;
 
-    access_log /var/log/nginx/local-unasus2_38.moodle.ufsc.br-access.log;
-    error_log  /var/log/nginx/local-unasus2_38.moodle.ufsc.br-error.log error;
+    access_log /var/log/nginx/local-unasus2-38.moodle.ufsc.br-access.log;
+    error_log  /var/log/nginx/local-unasus2-38.moodle.ufsc.br-error.log error;
 
     charset utf-8;
 
