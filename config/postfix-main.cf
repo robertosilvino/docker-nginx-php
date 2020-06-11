@@ -1,0 +1,26 @@
+compatibility_level = 2
+
+queue_directory = /var/spool/postfix
+command_directory = /usr/sbin
+daemon_directory = /usr/libexec/postfix
+data_directory = /var/lib/postfix
+
+mail_owner = postfix
+
+myhostname = m01.moodle.ufsc.br
+mydomain = moodle.ufsc.br
+inet_interfaces = all
+unknown_local_recipient_reject_code = 550
+
+mynetworks = 127.0.0.0/8
+
+relayhost = [150.162.1.141]
+
+smtpd_banner = $myhostname ESMTP $mail_name (Ubuntu)
+
+debugger_command =
+         PATH=/bin:/usr/bin:/usr/local/bin:/usr/X11R6/bin
+         ddd $daemon_directory/$process_name $process_id & sleep 5
+
+readme_directory = no
+inet_protocols = ipv4

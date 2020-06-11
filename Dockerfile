@@ -1,63 +1,37 @@
-FROM phusion/baseimage:0.11
+FROM alpine:3.9
 
-# Ensure UTF-8
-RUN locale-gen pt_BR.UTF-8
-ENV LANG       pt_BR.UTF-8
-ENV LC_ALL     pt_BR.UTF-8
+RUN adduser -D --uid 1001 -g 'moodle' moodle && mkdir -p /home/moodle/www/ead2 && chown -R moodle:moodle /home/moodle/www/ead2
 
-ENV HOME /root
+# Install packages
+RUN apk --no-cache add php7 php7-fpm php7-mysqli php7-json php7-openssl php7-curl \
+    php7-zlib php7-xml php7-phar php7-intl php7-dom php7-xmlreader php7-ctype \
+    php7-mbstring php7-gd php7-iconv php7-zip php7-pear php7-memcached php7-redis \
+    php7-pgsql php7-pspell php7-pdo_dblib php7-xmlrpc php7-opcache php7-imagick \
+    php7-simplexml php7-fileinfo php7-tokenizer php7-soap php7-apcu nginx supervisor \
+    curl zip unzip gzip unrar postfix htop bash git vim && chown -R moodle:moodle /var/tmp/nginx
 
-RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
-
-CMD ["/sbin/my_init"]
-
-# Nginx-PHP Installation
-RUN apt-get update
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y vim curl wget build-essential software-properties-common
-RUN add-apt-repository -y ppa:ondrej/php
-RUN add-apt-repository -y ppa:nginx/stable
-#RUN apt-get update
-RUN apt-get update --fix-missing
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y php7.0 php7.0-cli php7.0-fpm php7.0-mysql \
- php7.0-curl php7.0-gd php7.0-mcrypt php7.0-intl php7.0-imap php7.0-tidy php7.0-xml php7.0-xmlrpc php7.0-dom \
- php7.0-zip php7.0-soap php7.0-mbstring php7.0-pspell php7.0-recode php7.0-sqlite3 php7.0-xsl
-# php-xdebug
-
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y freetds-bin php7.0-sybase php7.0-dev php-pear
-## moodle3.0
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y ghostscript
-
-## pear e zend framework
+# Install Zend with PEAR
 RUN pear channel-discover pear.dotkernel.com/zf1/svn && pear install zend/zend
 
-RUN sed -i "s/;date.timezone =.*/date.timezone = UTC/" /etc/php/7.0/fpm/php.ini
-RUN sed -i "s/;date.timezone =.*/date.timezone = UTC/" /etc/php/7.0/cli/php.ini
+# Configure nginx
+COPY config/nginx-ead2.conf /etc/nginx/nginx.conf
 
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y nginx
+#Configure postfix relay
+COPY config/postfix-main.cf /etc/postfix/main.cf
 
-RUN echo "daemon off;" >> /etc/nginx/nginx.conf
-RUN sed -i -e "s/;daemonize\s*=\s*yes/daemonize = no/g" /etc/php/7.0/fpm/php-fpm.conf
-RUN sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php/7.0/fpm/php.ini
+#Configure freetds
+COPY config/freetds.conf /etc/freetds.conf
 
 # Configure PHP-FPM
-COPY .docker-config/fpm-pool.conf /etc/php/7.0/fpm/zzz_custom.conf
-COPY .docker-config/php.ini /etc/php/7.0/fpm/conf.d/zzz_custom.ini
-COPY .docker-config/www.conf /etc/php/7.0/fpm/conf.d/www.conf
+COPY config/fpm-pool.conf /etc/php7/php-fpm.d/zzz_custom.conf
+COPY config/php.ini /etc/php7/conf.d/zzz_custom.ini
+COPY config/www.conf /etc/php7/php-fpm.d/www.conf
 
-RUN mkdir           /etc/service/nginx
-ADD build/nginx.sh  /etc/service/nginx/run
-RUN chmod +x        /etc/service/nginx/run
-RUN mkdir           /etc/service/phpfpm
-ADD build/phpfpm.sh /etc/service/phpfpm/run
-RUN chmod +x        /etc/service/phpfpm/run
+# Configure supervisord
+COPY config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-RUN chown -R :www-data /var/www && \
-    mkdir -p /moodledata && \
-    chown -R :www-data /moodledata
-
-RUN rm -rf .docker-config/
+WORKDIR /home/moodle/www/ead2
 
 EXPOSE 80
-# End Nginx-PHP
-
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#EXPOSE 80 443
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
